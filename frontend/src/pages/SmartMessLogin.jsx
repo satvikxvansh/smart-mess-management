@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import logo from '../assets/BITlogo.png';
 
 const campusImg =
   "https://bitmesra.ac.in/UploadedDocuments/user_pratyush_869/Header/Header295e75781b0f4b19b292cba095f2d310_Institute_Building.png";
@@ -6,13 +9,7 @@ const campusImg =
 const BITLogo = () => (
   <div className="flex items-center gap-3 mb-6">
     <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center shadow-lg border-2 border-red-600 overflow-hidden">
-      <svg viewBox="0 0 60 60" className="w-12 h-12">
-        <circle cx="30" cy="30" r="28" fill="#b91c1c" />
-        <circle cx="30" cy="30" r="22" fill="white" />
-        <text x="30" y="27" textAnchor="middle" fontSize="7" fontWeight="bold" fill="#b91c1c" fontFamily="serif">BIT</text>
-        <text x="30" y="35" textAnchor="middle" fontSize="4.5" fill="#b91c1c" fontFamily="serif">MESRA</text>
-        <circle cx="30" cy="30" r="28" fill="none" stroke="#fbbf24" strokeWidth="1.5" />
-      </svg>
+      <img src={logo} alt="" />
     </div>
     <div>
       <p className="text-white font-bold text-sm leading-tight tracking-wide">BIRLA INSTITUTE OF TECHNOLOGY</p>
@@ -35,6 +32,11 @@ const EyeIcon = ({ show }) => (
 );
 
 export default function SmartMessLogin() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
   const [tab, setTab] = useState("student"); // "student" | "admin"
   const [studentMode, setStudentMode] = useState("login"); // "login" | "register"
   const [showPass, setShowPass] = useState(false);
@@ -46,9 +48,41 @@ export default function SmartMessLogin() {
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert(tab === "admin" ? "Admin login submitted!" : studentMode === "login" ? "Student login submitted!" : "Registration submitted!");
+    setError("");
+    setSubmitting(true);
+
+    try {
+      if (tab === "student" && studentMode === "register") {
+        // ── REGISTER path ──────────────────────────────────────────────
+        const result = await login({
+          tab: "student",
+          formData: form,   // the full registration form object
+        });
+        alert(result.message); // "Request submitted. Awaiting admin approval."
+        setStudentMode("login");
+
+      } else {
+        // ── LOGIN path (student or admin) ──────────────────────────────
+        const profile = await login({
+          tab,
+          username: tab === "admin" ? form.username : form.username,
+          password: form.password,
+        });
+
+        // AuthContext sets user state; now navigate to the correct portal
+        if (profile.role === "admin") {
+          navigate("/admin", { replace: true });
+        } else {
+          navigate("/dashboard", { replace: true });
+        }
+      }
+    } catch (err) {
+      setError(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -235,9 +269,15 @@ export default function SmartMessLogin() {
                     </div>
                   )}
 
-                  <button type="submit"
-                    className="w-full mt-2 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold py-3 rounded-xl text-sm tracking-wide shadow-lg shadow-blue-200 transition-all">
-                    {studentMode === "login" ? "Sign In" : "Create Account"}
+                  {error && (
+                    <div className="bg-red-50 border border-red-200 rounded-xl px-3 py-2.5 text-xs text-red-600 font-medium">
+                      ⚠️ {error}
+                    </div>
+                  )}
+
+                  <button type="submit" disabled={submitting}
+                    className="w-full mt-2 bg-blue-600 ... disabled:opacity-60 disabled:cursor-not-allowed">
+                    {submitting ? "Signing in…" : "Sign In"}
                   </button>
 
                   {studentMode === "login" && (

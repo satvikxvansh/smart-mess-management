@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
-// ─── Mock Student Data ────────────────────────────────────────────────────────
-const STUDENT = {
+// ─── Mock user Data ────────────────────────────────────────────────────────
+const user = {
   name: "Arjun Kumar Singh",
   rollNo: "BT22CSE047",
   department: "Computer Science & Engineering",
@@ -225,7 +227,11 @@ const MessRequestModal = ({ onClose }) => {
 
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
 
-export default function StudentDashboard() {
+export default function userDashboard() {
+  // const { user } = useAuth();
+  const navigate = useNavigate();
+  const { logout, user } = useAuth();
+
   const [activeNav, setActiveNav] = useState("dashboard");
   const [showReview, setShowReview] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
@@ -262,14 +268,14 @@ export default function StudentDashboard() {
           </div>
         </div>
 
-        {/* Student mini-card */}
+        {/* user mini-card */}
         <div className="mx-3 mt-4 mb-2 bg-white/5 rounded-xl p-3 flex items-center gap-3">
           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
-            {STUDENT.avatar}
+            {user.avatar}
           </div>
           <div className="overflow-hidden">
-            <p className="text-white text-xs font-semibold truncate">{STUDENT.name.split(" ")[0]} {STUDENT.name.split(" ")[1]}</p>
-            <p className="text-white/40 text-xs truncate">{STUDENT.rollNo}</p>
+            <p className="text-white text-xs font-semibold truncate">{user.name.split(" ")[0]} {user.name.split(" ")[1]}</p>
+            <p className="text-white/40 text-xs truncate">{user.rollNo}</p>
           </div>
         </div>
 
@@ -291,8 +297,8 @@ export default function StudentDashboard() {
 
         <div className="p-3 border-t border-white/10">
           {/* NOTE: This button would call logout() and redirect to /login */}
-          <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all">
-            <span>⏻</span> Sign Out
+          <button onClick={() => { logout(); navigate("/login", { replace: true }); }}>
+            Sign Out
           </button>
         </div>
       </aside>
@@ -308,7 +314,7 @@ export default function StudentDashboard() {
           <div className="flex items-center gap-3">
             <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-gray-500 hover:text-gray-700 text-xl p-1">☰</button>
             <div>
-              <h1 className="text-base font-extrabold text-gray-800">Student Dashboard</h1>
+              <h1 className="text-base font-extrabold text-gray-800">user Dashboard</h1>
               <p className="text-xs text-gray-400 hidden sm:block">
                 {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
               </p>
@@ -321,7 +327,7 @@ export default function StudentDashboard() {
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-xs">
-              {STUDENT.avatar}
+              {user.avatar}
             </div>
           </div>
         </header>
@@ -335,13 +341,13 @@ export default function StudentDashboard() {
             <div className="absolute right-10 -bottom-8 w-24 h-24 bg-white/5 rounded-full" />
             <div className="relative">
               <p className="text-blue-200 text-xs mb-1">Welcome back 👋</p>
-              <h2 className="text-xl font-extrabold mb-1">{STUDENT.name}</h2>
+              <h2 className="text-xl font-extrabold mb-1">{user.name}</h2>
               <div className="flex flex-wrap gap-2 mt-2">
-                <Badge color="blue">{STUDENT.rollNo}</Badge>
-                <span className="text-xs bg-white/10 rounded-full px-2.5 py-0.5">{STUDENT.department}</span>
-                <span className="text-xs bg-white/10 rounded-full px-2.5 py-0.5">{STUDENT.messBlock}</span>
-                <span className={`text-xs rounded-full px-2.5 py-0.5 font-semibold ${STUDENT.feeStatus === "Paid" ? "bg-green-400/20 text-green-300" : "bg-red-400/20 text-red-300"}`}>
-                  Fee: {STUDENT.feeStatus}
+                <Badge color="blue">{user.rollNo}</Badge>
+                <span className="text-xs bg-white/10 rounded-full px-2.5 py-0.5">{user.department}</span>
+                <span className="text-xs bg-white/10 rounded-full px-2.5 py-0.5">{user.messBlock}</span>
+                <span className={`text-xs rounded-full px-2.5 py-0.5 font-semibold ${user.feeStatus === "Paid" ? "bg-green-400/20 text-green-300" : "bg-red-400/20 text-red-300"}`}>
+                  Fee: {user.feeStatus}
                 </span>
               </div>
             </div>
@@ -497,7 +503,7 @@ export default function StudentDashboard() {
                 </div>
               </SectionCard>
 
-              {/* Student Info */}
+              {/* user Info */}
               <SectionCard title="My Profile" icon="🎓"
                 action={
                   // NOTE: "Edit" navigates to profile/settings page
@@ -506,12 +512,12 @@ export default function StudentDashboard() {
                 }>
                 <dl className="space-y-2.5">
                   {[
-                    { label: "Roll No.", value: STUDENT.rollNo },
-                    { label: "Department", value: STUDENT.department },
-                    { label: "Year", value: STUDENT.year },
-                    { label: "Hostel", value: STUDENT.hostel },
-                    { label: "Mess Type", value: STUDENT.messType },
-                    { label: "Valid Till", value: STUDENT.validTill },
+                    { label: "Roll No.", value: user.rollNo },
+                    { label: "Department", value: user.department },
+                    { label: "Year", value: user.year },
+                    { label: "Hostel", value: user.hostel },
+                    { label: "Mess Type", value: user.messType },
+                    { label: "Valid Till", value: user.validTill },
                   ].map(f => (
                     <div key={f.label} className="flex justify-between items-start gap-2">
                       <dt className="text-xs text-gray-400 flex-shrink-0">{f.label}</dt>
@@ -558,18 +564,18 @@ export default function StudentDashboard() {
                   <div className="w-20 h-20 bg-white rounded-lg mx-auto mb-3 flex items-center justify-center overflow-hidden">
                     {/* Simple QR representation */}
                     <svg viewBox="0 0 40 40" className="w-16 h-16">
-                      {[0,1,2,3,4,5,6].map(r => [0,1,2,3,4,5,6].map(c => {
+                      {[0, 1, 2, 3, 4, 5, 6].map(r => [0, 1, 2, 3, 4, 5, 6].map(c => {
                         const corner = (r < 2 && c < 2) || (r < 2 && c > 4) || (r > 4 && c < 2);
                         const val = (r * 7 + c * 3 + 5) % 2 === 0;
                         return val ? <rect key={`${r}-${c}`} x={c * 5 + 2.5} y={r * 5 + 2.5} width="4" height="4" fill={corner ? "#0f172a" : "#374151"} /> : null;
                       }))}
                     </svg>
                   </div>
-                  <p className="font-bold text-sm">{STUDENT.name.split(" ")[0]} {STUDENT.name.split(" ")[1]}</p>
-                  <p className="text-white/50 text-xs">{STUDENT.rollNo}</p>
+                  <p className="font-bold text-sm">{user.name.split(" ")[0]} {user.name.split(" ")[1]}</p>
+                  <p className="text-white/50 text-xs">{user.rollNo}</p>
                   <div className="mt-2 flex justify-center gap-1.5">
                     <span className="text-xs bg-green-500/20 text-green-300 rounded-full px-2 py-0.5">Active</span>
-                    <span className="text-xs bg-white/10 rounded-full px-2 py-0.5">{STUDENT.messType}</span>
+                    <span className="text-xs bg-white/10 rounded-full px-2 py-0.5">{user.messType}</span>
                   </div>
                 </div>
                 {/* NOTE: "Download Card" would trigger PDF generation/download */}
