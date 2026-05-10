@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import QRScannerModal from "../components/QRScannerModal";
+import AnalyticsTab from "../components/AnalyticsTab";
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 const ADMIN = { name: "Dr. R. K. Sharma", role: "Mess Manager", block: "Mess Block – A", avatar: "RS" };
@@ -255,7 +257,7 @@ const AnnouncementModal = ({ onClose }) => {
 // ─── Main Admin Dashboard ─────────────────────────────────────────────────────
 export default function AdminDashboard() {
   // const { user } = useAuth();
-  const navigate    = useNavigate();
+  const navigate = useNavigate();
   const { logout, user } = useAuth();
   const [activeNav, setActiveNav] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -266,7 +268,7 @@ export default function AdminDashboard() {
   const [students, setStudents] = useState(ALL_STUDENTS);
   const [searchQ, setSearchQ] = useState("");
   const [toastMsg, setToastMsg] = useState(null);
-
+  const [scannerOpen, setScannerOpen] = useState(false);
   const toast = (msg, color = "green") => {
     setToastMsg({ msg, color });
     setTimeout(() => setToastMsg(null), 3000);
@@ -295,7 +297,8 @@ export default function AdminDashboard() {
     { id: "requests", label: "Student Requests", icon: "👤", badge: pendingList.length },
     { id: "students", label: "All Students", icon: "🎓" },
     { id: "menu", label: "Mess Menu", icon: "🍽️" },
-    { id: "expenses", label: "Expenses", icon: "📊" },
+    { id: "analytics", label: "Analytics", icon: "📊" },
+    // { id: "expenses", label: "Expenses", icon: "📊" },
     { id: "announcements", label: "Announcements", icon: "📢" },
     { id: "reviews", label: "Reviews", icon: "⭐" },
     { id: "attendance", label: "Attendance Log", icon: "📅" }, // → redirect to detailed attendance page
@@ -348,7 +351,7 @@ export default function AdminDashboard() {
               )}
             </button>
           ))}
-        </nav>  
+        </nav>
 
         <div className="p-3 border-t border-white/10">
           {/* NOTE: Logout → navigate to /login */}
@@ -465,8 +468,7 @@ export default function AdminDashboard() {
                         { label: "Log Expense", icon: "📊", color: "bg-blue-50 hover:bg-blue-100 text-blue-700", fn: () => setShowExpense(true) },
                         { label: "Announce", icon: "📢", color: "bg-red-50 hover:bg-red-100 text-red-700", fn: () => setShowAnnouncement(true) },
                         { label: "Requests", icon: "⏳", color: "bg-amber-50 hover:bg-amber-100 text-amber-700", fn: () => setActiveNav("requests") },
-                        // NOTE: "Mark Attendance" → navigate to attendance marking page
-                        { label: "Mark Attendance", icon: "✅", color: "bg-emerald-50 hover:bg-emerald-100 text-emerald-700", fn: () => alert("Navigating to attendance marking page...") },
+                        { label: "Scan QR", icon: "🔑", color: "bg-emerald-50 hover:bg-emerald-100 text-emerald-700", fn: () => setScannerOpen(true) },
                         // NOTE: "Export Report" → navigate to reports page
                         { label: "Export Report", icon: "📄", color: "bg-violet-50 hover:bg-violet-100 text-violet-700", fn: () => alert("Navigating to reports export page...") },
                       ].map(a => (
@@ -872,6 +874,8 @@ export default function AdminDashboard() {
             </div>
           )}
 
+          {activeNav === "analytics" && <AnalyticsTab />}
+
         </main>
       </div>
 
@@ -879,6 +883,7 @@ export default function AdminDashboard() {
       {showMenu && <MenuModal onClose={() => setShowMenu(false)} />}
       {showExpense && <ExpenseModal onClose={() => setShowExpense(false)} />}
       {showAnnouncement && <AnnouncementModal onClose={() => setShowAnnouncement(false)} />}
+      {scannerOpen && <QRScannerModal onClose={() => setScannerOpen(false)} />}
 
       {/* ── Toast ── */}
       {toastMsg && (

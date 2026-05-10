@@ -30,9 +30,7 @@ const PORT = process.env.PORT || 5000;
 const generateToken = (payload, expiresIn = process.env.JWT_EXPIRES_IN || "7d") =>
   jwt.sign(payload, process.env.JWT_SECRET, { expiresIn });
 
-/**
- * Hash a plain-text password.
- */
+//Hash a plain-text password.
 const hashPassword = async (plain) => bcrypt.hash(plain, 12);
 
 /**
@@ -40,9 +38,7 @@ const hashPassword = async (plain) => bcrypt.hash(plain, 12);
  */
 const comparePassword = async (plain, hashed) => bcrypt.compare(plain, hashed);
 
-/**
- * Strip sensitive fields from a mongoose document before sending to client.
- */
+// Strip sensitive fields from a mongoose document before sending to client.
 const sanitizeStudent = (doc) => {
   const obj = doc.toObject ? doc.toObject() : doc;
   const { password, __v, ...safe } = obj;

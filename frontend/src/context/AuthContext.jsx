@@ -1,4 +1,3 @@
-// src/context/AuthContext.jsx
 import { createContext, useContext, useState, useEffect } from "react";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -146,18 +145,11 @@ export function AuthProvider({ children }) {
   };
 
   // ── Central login dispatcher called by the login page ─────────────────────
-  const login = async ({ tab, username, password, formData }) => {
-    let profile;
-    if (tab === "admin") {
-      profile = await loginAdmin({ username, password });
-    } else if (formData) {
-      // registration path — no auto-login
-      return await registerStudent(formData);
-    } else {
-      profile = await loginStudent({ username, password });
-    }
-    setUser(profile);
-    return profile;
+  const login = async ({ tab, _resolvedProfile }) => {
+    // _resolvedProfile comes directly from the API response (data.data)
+    // We just store it in state — no second fetch needed
+    setUser({ ...(_resolvedProfile), role: tab === "admin" ? "admin" : "student" });
+    return _resolvedProfile;
   };
 
   return (

@@ -1,18 +1,25 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-
+import MessRequestModal from "../components/MessRequestModal";
+import MealQRCard from "../components/Mealqrcard";
 // ─── Mock user Data ────────────────────────────────────────────────────────
+
+const bookedSet = new Set([
+  `${new Date().toDateString()}_breakfast`,
+  `${new Date().toDateString()}_lunch`,
+]);
+
 const user = {
-  name: "Arjun Kumar Singh",
-  rollNo: "BT22CSE047",
-  department: "Computer Science & Engineering",
+  name: "Deepesh Sharma",
+  rollNo: "BTECH/10743/23",
+  department: "Electronics & Communication Engineering",
   year: "3rd Year",
-  hostel: "RK Hall – Room 214",
-  email: "arjun.kumar@bitmesra.ac.in",
+  hostel: "Hostel 13 - Room 222",
+  email: "btech10743.23@bitmesra.ac.in",
   phone: "+91 98765 43210",
-  messType: "Veg",
-  messBlock: "Mess Block – A",
+  messType: "Non-Veg",
+  messBlock: "",
   feeStatus: "Paid",
   avatar: "AK",
   validTill: "May 2025",
@@ -176,54 +183,8 @@ const PaymentModal = ({ onClose }) => {
     </div>
   );
 };
-
-const MessRequestModal = ({ onClose }) => {
-  const [selected, setSelected] = useState({ B: true, L: true, D: true });
-  const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
-  const dateStr = tomorrow.toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" });
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="font-extrabold text-gray-800 text-lg">Request Mess Access</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
-        </div>
-        <p className="text-gray-400 text-xs mb-5">Select meals for <span className="text-blue-600 font-semibold">{dateStr}</span></p>
-        <div className="space-y-3 mb-5">
-          {[
-            { key: "B", label: "Breakfast", time: "7:30 AM – 9:00 AM", icon: "🌅" },
-            { key: "L", label: "Lunch", time: "12:30 PM – 2:30 PM", icon: "☀️" },
-            { key: "D", label: "Dinner", time: "7:30 PM – 9:30 PM", icon: "🌙" },
-          ].map(m => (
-            <div key={m.key} onClick={() => setSelected(s => ({ ...s, [m.key]: !s[m.key] }))}
-              className={`flex items-center justify-between rounded-xl px-4 py-3 cursor-pointer border-2 transition-all ${selected[m.key] ? "border-blue-500 bg-blue-50" : "border-gray-200 bg-gray-50"}`}>
-              <div className="flex items-center gap-3">
-                <span className="text-xl">{m.icon}</span>
-                <div>
-                  <p className="text-sm font-semibold text-gray-700">{m.label}</p>
-                  <p className="text-xs text-gray-400">{m.time}</p>
-                </div>
-              </div>
-              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${selected[m.key] ? "border-blue-500 bg-blue-500" : "border-gray-300"}`}>
-                {selected[m.key] && <span className="text-white text-xs">✓</span>}
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 mb-4">
-          <p className="text-xs text-amber-700">⚠️ Requests must be submitted before <strong>10:00 PM</strong> tonight. Changes not allowed after submission.</p>
-        </div>
-        <div className="flex gap-2">
-          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-500">Cancel</button>
-          <button onClick={() => { alert("Mess request submitted successfully!"); onClose(); }}
-            className="flex-1 py-2.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold text-sm shadow shadow-green-200 transition-all">
-            Confirm Request
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
+ 
+<MessRequestModal onClose={() => setOpen(false)} />
 
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
 
@@ -256,7 +217,7 @@ export default function userDashboard() {
     <div className="min-h-screen bg-gray-50 flex" style={{ fontFamily: "'DM Sans', 'Segoe UI', sans-serif" }}>
 
       {/* ── Sidebar ── */}
-      <aside className={`fixed inset-y-0 left-0 z-40 w-60 bg-[#0f172a] flex flex-col transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 lg:static lg:flex`}>
+      <aside className="fixed inset-y-0 left-0 z-40 w-60 bg-[#0f172a] flex flex-col transition-transform duration-300 lg:translate-x-0 lg:static lg:flex">
         {/* Logo */}
         <div className="px-5 py-5 border-b border-white/10">
           <div className="flex items-center gap-3">
@@ -314,7 +275,7 @@ export default function userDashboard() {
           <div className="flex items-center gap-3">
             <button onClick={() => setSidebarOpen(true)} className="lg:hidden text-gray-500 hover:text-gray-700 text-xl p-1">☰</button>
             <div>
-              <h1 className="text-base font-extrabold text-gray-800">user Dashboard</h1>
+              <h1 className="text-base font-extrabold text-gray-800">User Dashboard</h1>
               <p className="text-xs text-gray-400 hidden sm:block">
                 {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
               </p>
@@ -467,6 +428,12 @@ export default function userDashboard() {
             {/* RIGHT column */}
             <div className="space-y-4">
 
+              {/* Mess Card / QR */}
+              <MealQRCard
+                student={{ name: user.name, roll: user.rollNo, dept: user.branch }}
+                bookedSet={bookedSet}
+              />
+
               {/* Attendance ring */}
               <SectionCard title="Monthly Attendance" icon="📅">
                 <div className="flex flex-col items-center">
@@ -557,12 +524,10 @@ export default function userDashboard() {
                 </button>
               </SectionCard>
 
-              {/* Mess Card / QR */}
-              <SectionCard title="Digital Mess Card" icon="🪪">
+              {/* <SectionCard title="QR Code Generation" icon="🪪">
                 <div className="bg-gradient-to-br from-[#0f172a] to-[#1e3a5f] rounded-xl p-4 text-white text-center">
                   <p className="text-white/50 text-xs mb-1">BIT Mesra · Smart Mess</p>
                   <div className="w-20 h-20 bg-white rounded-lg mx-auto mb-3 flex items-center justify-center overflow-hidden">
-                    {/* Simple QR representation */}
                     <svg viewBox="0 0 40 40" className="w-16 h-16">
                       {[0, 1, 2, 3, 4, 5, 6].map(r => [0, 1, 2, 3, 4, 5, 6].map(c => {
                         const corner = (r < 2 && c < 2) || (r < 2 && c > 4) || (r > 4 && c < 2);
@@ -578,13 +543,11 @@ export default function userDashboard() {
                     <span className="text-xs bg-white/10 rounded-full px-2 py-0.5">{user.messType}</span>
                   </div>
                 </div>
-                {/* NOTE: "Download Card" would trigger PDF generation/download */}
                 <button onClick={() => alert("Generating downloadable mess card...")}
                   className="mt-3 w-full py-2 text-xs text-gray-600 font-semibold hover:bg-gray-100 rounded-xl transition-all border border-gray-200">
                   ⬇ Download Card
                 </button>
-              </SectionCard>
-
+              </SectionCard> */}
             </div>
           </div>
         </main>

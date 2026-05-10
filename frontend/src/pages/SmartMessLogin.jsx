@@ -48,41 +48,64 @@ export default function SmartMessLogin() {
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleStudentLogin = async () => {
     setError("");
     setSubmitting(true);
-
     try {
-      if (tab === "student" && studentMode === "register") {
-        // ── REGISTER path ──────────────────────────────────────────────
-        const result = await login({
-          tab: "student",
-          formData: form,   // the full registration form object
-        });
-        alert(result.message); // "Request submitted. Awaiting admin approval."
-        setStudentMode("login");
+      const res = await fetch("http://localhost:5000/api/auth/student/login", {
+        method : "POST",
+        headers: { "Content-Type": "application/json" },
+        body   : JSON.stringify({ rollNo: form.username, password: form.password }),
+      });
 
-      } else {
-        // ── LOGIN path (student or admin) ──────────────────────────────
-        const profile = await login({
-          tab,
-          username: tab === "admin" ? form.username : form.username,
-          password: form.password,
-        });
+      const data = await res.json();
 
-        // AuthContext sets user state; now navigate to the correct portal
-        if (profile.role === "admin") {
-          navigate("/admin", { replace: true });
-        } else {
-          navigate("/dashboard", { replace: true });
-        }
-      }
+      if (!res.ok) throw new Error(data.message || "Login failed.");
+
+      // Save token + set user in AuthContext
+      localStorage.setItem("mess_token", data.token);
+      await login({ tab: "student", _resolvedProfile: data.data });
+
+      navigate("/dashboard", { replace: true });
+
     } catch (err) {
-      setError(err.message || "Something went wrong. Please try again.");
+      setError(err.message);
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleAdminLogin = async () => {
+    setError("");
+    setSubmitting(true);
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/admin/login", {
+        method : "POST",
+        headers: { "Content-Type": "application/json" },
+        body   : JSON.stringify({ adminId: form.username, password: form.password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message || "Admin login failed.");
+
+      localStorage.setItem("mess_token", data.token);
+      await login({ tab: "admin", _resolvedProfile: data.data });
+
+      navigate("/admin", { replace: true });
+
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (tab === "admin")                    return handleAdminLogin();
+    if (tab === "student" && studentMode === "login") return handleStudentLogin();
+    // registration path stays as-is (you can wire that separately)
   };
 
   return (
@@ -276,7 +299,7 @@ export default function SmartMessLogin() {
                   )}
 
                   <button type="submit" disabled={submitting}
-                    className="w-full mt-2 bg-blue-600 ... disabled:opacity-60 disabled:cursor-not-allowed">
+                    className="w-full p-2 rounded-xl cursor-pointer mt-2 bg-blue-600 ... disabled:opacity-60 disabled:cursor-not-allowed">
                     {submitting ? "Signing in…" : "Sign In"}
                   </button>
 

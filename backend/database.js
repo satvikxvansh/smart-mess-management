@@ -11,10 +11,6 @@ const mongoose = require("mongoose");
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI, {
-      // useNewUrlParser and useUnifiedTopology are defaults in mongoose 7+
-      // Add them explicitly if you're on mongoose 6:
-      // useNewUrlParser   : true,
-      // useUnifiedTopology: true,
     });
     console.log(`✅ MongoDB connected: ${conn.connection.host}`);
   } catch (err) {
@@ -147,10 +143,10 @@ studentSchema.virtual("initials").get(function () {
 });
 
 // ── Indexes ───────────────────────────────────────────────────────────────────
-studentSchema.index({ rollNo: 1 });
-studentSchema.index({ email: 1 });
-studentSchema.index({ status: 1 });
-studentSchema.index({ department: 1, year: 1 });
+// studentSchema.index({ rollNo: 1 });
+// studentSchema.index({ email: 1 });
+// studentSchema.index({ status: 1 });
+// studentSchema.index({ department: 1, year: 1 });
 
 const Student = mongoose.model("Student", studentSchema);
 
@@ -221,8 +217,8 @@ const adminSchema = new mongoose.Schema(
   }
 );
 
-adminSchema.index({ adminId: 1 });
-adminSchema.index({ email  : 1 });
+// adminSchema.index({ adminId: 1 });
+// adminSchema.index({ email  : 1 });
 
 const Admin = mongoose.model("Admin", adminSchema);
 
