@@ -1,8 +1,3 @@
-// AnalyticsTab.jsx
-// Drop-in for: {activeNav === "analytics" && <AnalyticsTab />}
-//
-// Requires: npm install recharts   (likely already installed)
-
 import { useState } from "react";
 import {
   LineChart, Line, BarChart, Bar,

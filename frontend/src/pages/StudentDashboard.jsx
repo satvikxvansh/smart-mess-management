@@ -283,6 +283,15 @@ export default function userDashboard() {
           </div>
           <div className="flex items-center gap-3">
             {/* NOTE: Bell icon would open a notifications panel/page */}
+            <button onClick={() => {
+              localStorage.removeItem("mess_token");
+              localStorage.removeItem("mess_user");
+              navigate("/login", { replace: true });
+              window.location.reload()
+            }}
+              className="hidden sm:flex items-center gap-1.5 text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer">
+              Log out
+            </button>
             <button className="relative w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-all">
               🔔
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>

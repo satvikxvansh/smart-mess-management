@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import QRScannerModal from "../components/QRScannerModal";
 import AnalyticsTab from "../components/AnalyticsTab";
+import MLPredictionsTab from "../components/MLPredictionsTab";
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 const ADMIN = { name: "Dr. R. K. Sharma", role: "Mess Manager", block: "Mess Block – A", avatar: "RS" };
@@ -298,6 +299,7 @@ export default function AdminDashboard() {
     { id: "students", label: "All Students", icon: "🎓" },
     { id: "menu", label: "Mess Menu", icon: "🍽️" },
     { id: "analytics", label: "Analytics", icon: "📊" },
+    { id: "ml", label: "ML Based Analysis", icon: "📉" },
     // { id: "expenses", label: "Expenses", icon: "📊" },
     { id: "announcements", label: "Announcements", icon: "📢" },
     { id: "reviews", label: "Reviews", icon: "⭐" },
@@ -386,8 +388,17 @@ export default function AdminDashboard() {
               📊 Log Expense
             </button>
             <button onClick={() => setShowAnnouncement(true)}
-              className="hidden sm:flex items-center gap-1.5 text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-xl font-semibold transition-all">
+              className="hidden sm:flex items-center gap-1.5 text-xs bg-red-400 hover:bg-red-500 text-white px-3 py-2 rounded-xl font-semibold transition-all">
               📢 Announce
+            </button>
+            <button onClick={() => {
+              localStorage.removeItem("mess_token");
+              localStorage.removeItem("mess_user");
+              navigate("/login", { replace: true });
+              window.location.reload()
+            }}
+              className="hidden sm:flex items-center gap-1.5 text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer">
+              Log out
             </button>
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-red-400 to-rose-600 flex items-center justify-center text-white font-bold text-xs">{ADMIN.avatar}</div>
           </div>
@@ -875,6 +886,8 @@ export default function AdminDashboard() {
           )}
 
           {activeNav === "analytics" && <AnalyticsTab />}
+
+          {activeNav === "ml" && <MLPredictionsTab />}
 
         </main>
       </div>
