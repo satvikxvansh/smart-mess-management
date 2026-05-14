@@ -1,0 +1,90 @@
+{
+  "waste_model": {
+    "accuracy_r2_pct": 93.09,
+    "mae": 0.506,
+    "description": "RandomForest \u2014 predicts daily food waste %"
+  },
+  "money_model": {
+    "accuracy_r2_pct": 89.95,
+    "mae": 131.16,
+    "description": "GradientBoosting \u2014 predicts money wasted per day (INR)"
+  },
+  "feature_importance": {
+    "day_of_week": 0.052,
+    "month": 0.033,
+    "breakfast_booked": 0.006,
+    "lunch_booked": 0.133,
+    "dinner_booked": 0.041,
+    "menu_type": 0.321,
+    "total_booked": 0.414
+  },
+  "forecast_next_7_days": [
+    {
+      "day": "Mon",
+      "predicted_waste_pct": 3.0,
+      "predicted_money_wasted": 1076.96,
+      "estimated_savings": 357.04,
+      "predicted_attendance": 722,
+      "booked_count": 780
+    },
+    {
+      "day": "Tue",
+      "predicted_waste_pct": 3.86,
+      "predicted_money_wasted": 1341.75,
+      "estimated_savings": 92.26,
+      "predicted_attendance": 727,
+      "booked_count": 780
+    },
+    {
+      "day": "Wed",
+      "predicted_waste_pct": 3.84,
+      "predicted_money_wasted": 1341.75,
+      "estimated_savings": 92.26,
+      "predicted_attendance": 726,
+      "booked_count": 780
+    },
+    {
+      "day": "Thu",
+      "predicted_waste_pct": 3.0,
+      "predicted_money_wasted": 1049.52,
+      "estimated_savings": 384.48,
+      "predicted_attendance": 720,
+      "booked_count": 780
+    },
+    {
+      "day": "Fri",
+      "predicted_waste_pct": 3.86,
+      "predicted_money_wasted": 1341.75,
+      "estimated_savings": 92.26,
+      "predicted_attendance": 724,
+      "booked_count": 780
+    },
+    {
+      "day": "Sat",
+      "predicted_waste_pct": 10.55,
+      "predicted_money_wasted": 2476.84,
+      "estimated_savings": 0,
+      "predicted_attendance": 498,
+      "booked_count": 540
+    },
+    {
+      "day": "Sun",
+      "predicted_waste_pct": 5.63,
+      "predicted_money_wasted": 1389.17,
+      "estimated_savings": 44.84,
+      "predicted_attendance": 500,
+      "booked_count": 540
+    }
+  ],
+  "attendance_model": {
+    "accuracy_r2_pct": 96.47,
+    "mae": 17.81,
+    "description": "RandomForest \u2014 predicts actual daily attendance from bookings"
+  },
+  "summary": {
+    "avg_daily_waste_pct": 5.3,
+    "avg_daily_money_wasted": 1434.0,
+    "projected_monthly_savings": 4556.31,
+    "cost_per_kg_inr": 80
+  }
+}
