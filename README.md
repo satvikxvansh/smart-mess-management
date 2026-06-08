@@ -57,7 +57,7 @@ The system supports two distinct portals — a **Student Portal** for meal track
 
 <br/>
 
-<img src="./screenshots/RequestMessAccess.png" width="49%"  /> <img src="./screenshots/MessPass.png" width="49%" height=341 />
+<img src="./screenshots/RequestMessAccess.png" width="49%"  /> <img src="./screenshots/MessPass.png" width="49%" />
 <br/>
 
 
