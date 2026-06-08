@@ -1,12 +1,3 @@
-/**
- * MLPredictionsTab.jsx
- *
- * Usage: {activeNav === "ml" && <MLPredictionsTab />}
- * Requires: npm install recharts (already installed)
- *
- * Calls: GET http://localhost:5000/api/predictions
- */
-
 import { useEffect, useState } from "react";
 import {
   LineChart, Line, BarChart, Bar,
@@ -14,10 +5,11 @@ import {
   ResponsiveContainer, Legend, ReferenceLine,
 } from "recharts";
 
-const API = "http://localhost:8000/api/predictions";
+const API = `${import.meta.env.VITE_ML_API_URL}/api/predictions`;
+
 
 // ─── mock actual data to compare against predictions ────────────────────────
-// In production, replace this with your real attendance/waste DB data
+// In production, replace this with real attendance/waste DB data
 function getMockActuals(forecast) {
   return forecast.map((f) => ({
     day:              f.day,

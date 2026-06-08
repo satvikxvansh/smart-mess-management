@@ -52,7 +52,7 @@ export default function SmartMessLogin() {
     setError("");
     setSubmitting(true);
     try {
-      const res = await fetch("https://canteeniq-backend.onrender.com/api/auth/student/login", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/student/login`, {
         method : "POST",
         headers: { "Content-Type": "application/json" },
         body   : JSON.stringify({ rollNo: form.username, password: form.password }),
@@ -79,7 +79,7 @@ export default function SmartMessLogin() {
     setError("");
     setSubmitting(true);
     try {
-      const res = await fetch("https://canteeniq-backend.onrender.com/api/auth/admin/login", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/admin/login`, {
         method : "POST",
         headers: { "Content-Type": "application/json" },
         body   : JSON.stringify({ adminId: form.username, password: form.password }),
