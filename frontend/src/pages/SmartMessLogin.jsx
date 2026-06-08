@@ -52,7 +52,7 @@ export default function SmartMessLogin() {
     setError("");
     setSubmitting(true);
     try {
-      const res = await fetch("http://localhost:5000/api/auth/student/login", {
+      const res = await fetch("https://canteeniq-backend.onrender.com/api/auth/student/login", {
         method : "POST",
         headers: { "Content-Type": "application/json" },
         body   : JSON.stringify({ rollNo: form.username, password: form.password }),
@@ -79,7 +79,7 @@ export default function SmartMessLogin() {
     setError("");
     setSubmitting(true);
     try {
-      const res = await fetch("http://localhost:5000/api/auth/admin/login", {
+      const res = await fetch("https://canteeniq-backend.onrender.com/api/auth/admin/login", {
         method : "POST",
         headers: { "Content-Type": "application/json" },
         body   : JSON.stringify({ adminId: form.username, password: form.password }),
@@ -132,7 +132,7 @@ export default function SmartMessLogin() {
                 <span className="text-amber-300 text-xs font-semibold tracking-widest uppercase">Smart Mess Attendance</span>
               </div>
               <h1 className="text-3xl md:text-4xl font-extrabold leading-tight text-white mb-2">
-                Mess Attendance<br />
+                Smart Mess<br />
                 <span className="text-amber-400">Management System</span>
               </h1>
               <p className="text-white/70 text-sm leading-relaxed mt-3">
@@ -143,7 +143,7 @@ export default function SmartMessLogin() {
             <div className="space-y-3 mt-6">
               {[
                 { icon: "🍽️", title: "Real-time Meal Tracking", desc: "Mark attendance for breakfast, lunch & dinner" },
-                { icon: "📊", title: "Attendance Analytics", desc: "Visual reports & monthly summaries" },
+                { icon: "📊", title: "Food Wastage Analytics", desc: "Visual reports & monthly summaries" },
                 { icon: "🔔", title: "Smart Notifications", desc: "Alerts for low attendance & billing" },
                 { icon: "🎓", title: "Student Self-Service", desc: "Apply for leaves & view mess schedule" },
               ].map((f) => (
@@ -158,7 +158,7 @@ export default function SmartMessLogin() {
             </div>
           </div>
 
-          <p className="text-white/30 text-xs mt-8">© 2025 BIT Mesra — Smart Mess Attendance System</p>
+          <p className="text-white/30 text-xs mt-8">© 2026 BIT Mesra — Smart Mess Attendance System</p>
         </div>
 
         {/* RIGHT: Auth panel */}
@@ -219,7 +219,7 @@ export default function SmartMessLogin() {
                         <label className="block text-xs font-semibold text-gray-600 mb-1">Roll Number</label>
                         <input name="rollNo" value={form.rollNo} onChange={handleChange}
                           className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50"
-                          placeholder="e.g. BT22CSE001" required />
+                          placeholder="e.g. BTECH/10XXX/XX" required />
                       </div>
                       <div className="flex gap-2">
                         <div className="flex-1">
@@ -299,7 +299,7 @@ export default function SmartMessLogin() {
                   )}
 
                   <button type="submit" disabled={submitting}
-                    className="w-full p-2 rounded-xl cursor-pointer mt-2 bg-blue-600 ... disabled:opacity-60 disabled:cursor-not-allowed">
+                    className="text-white font-bold w-full p-2 rounded-xl cursor-pointer mt-2 bg-blue-600 ... disabled:opacity-60 disabled:cursor-not-allowed">
                     {submitting ? "Signing in…" : "Sign In"}
                   </button>
 
@@ -352,7 +352,7 @@ export default function SmartMessLogin() {
                   </div>
 
                   <button type="submit"
-                    className="w-full bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold py-3 rounded-xl text-sm tracking-wide shadow-lg shadow-red-200 transition-all">
+                    className="w-full bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold py-3 rounded-xl text-sm tracking-wide shadow-lg shadow-red-200 transition-all cursor-pointer">
                     Admin Login
                   </button>
 
@@ -377,7 +377,7 @@ export default function SmartMessLogin() {
           {/* Footer */}
           <div className="px-7 pb-5 pt-2 border-t border-gray-100">
             <p className="text-center text-gray-300 text-xs">
-              Smart Mess Attendance · BIT Mesra · v1.0
+              Smart Mess Attendance · BIT Mesra · v1.5
             </p>
           </div>
         </div>
