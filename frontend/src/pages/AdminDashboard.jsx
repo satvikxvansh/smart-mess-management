@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import QRScannerModal from "../components/QRScannerModal";
 import AnalyticsTab from "../components/AnalyticsTab";
 import MLPredictionsTab from "../components/MLPredictionsTab";
 
@@ -265,27 +264,85 @@ export default function AdminDashboard() {
   const [showMenu, setShowMenu] = useState(false);
   const [showExpense, setShowExpense] = useState(false);
   const [showAnnouncement, setShowAnnouncement] = useState(false);
-  const [pendingList, setPendingList] = useState(PENDING_STUDENTS);
+  const [pendingList, setPendingList] = useState([]);
   const [students, setStudents] = useState(ALL_STUDENTS);
   const [searchQ, setSearchQ] = useState("");
   const [toastMsg, setToastMsg] = useState(null);
-  const [scannerOpen, setScannerOpen] = useState(false);
   const toast = (msg, color = "green") => {
     setToastMsg({ msg, color });
     setTimeout(() => setToastMsg(null), 3000);
   };
 
-  const acceptStudent = (id) => {
-    const s = pendingList.find(x => x.id === id);
-    setPendingList(l => l.filter(x => x.id !== id));
-    setStudents(l => [...l, { id, name: s.name, roll: s.roll, dept: s.dept, year: s.year, status: "Active", fee: "Unpaid", attendance: 0 }]);
-    toast(`✓ ${s.name} approved and added to mess`);
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+  useEffect(() => {
+    fetchPendingStudents();
+  }, []);
+
+  const fetchPendingStudents = async () => {
+    try {
+      const token = localStorage.getItem("mess_token");
+      const res = await fetch(`${API_URL}/api/admin/students/pending`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPendingList(data.data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch pending students:", err);
+    }
   };
 
-  const rejectStudent = (id) => {
-    const s = pendingList.find(x => x.id === id);
-    setPendingList(l => l.filter(x => x.id !== id));
-    toast(`✗ ${s.name}'s request rejected`, "red");
+  const acceptStudent = async (id) => {
+    try {
+      const token = localStorage.getItem("mess_token");
+      const res = await fetch(`${API_URL}/api/admin/students/${id}/approve`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        const s = pendingList.find(x => x.id === id);
+        setPendingList(l => l.filter(x => x.id !== id));
+        setStudents(l => [...l, { id, name: s?.name, roll: s?.roll, dept: s?.dept, year: s?.year, status: "Active", fee: "Unpaid", attendance: 0 }]);
+        toast(`✓ ${s?.name || 'Student'} approved and added to mess`);
+      } else {
+        toast(data.message || "Failed to approve", "red");
+      }
+    } catch (err) {
+      console.error("Approve error:", err);
+      toast("Server error while approving", "red");
+    }
+  };
+
+  const rejectStudent = async (id) => {
+    try {
+      const token = localStorage.getItem("mess_token");
+      const res = await fetch(`${API_URL}/api/admin/students/${id}/reject`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        const s = pendingList.find(x => x.id === id);
+        setPendingList(l => l.filter(x => x.id !== id));
+        toast(`✗ ${s?.name || 'Student'}'s request rejected`, "red");
+      } else {
+        toast(data.message || "Failed to reject", "red");
+      }
+    } catch (err) {
+      console.error("Reject error:", err);
+      toast("Server error while rejecting", "red");
+    }
+  };
+
+  const approveAll = async () => {
+    for (const s of pendingList) {
+      await acceptStudent(s.id);
+    }
   };
 
   const filteredStudents = students.filter(s =>
@@ -307,6 +364,7 @@ export default function AdminDashboard() {
     { id: "reports", label: "Reports", icon: "📄" },          // → redirect to reports/export page
     { id: "settings", label: "Settings", icon: "⚙️" },        // → redirect to admin settings page
   ];
+  
 
   // ── Attendance heatmap mock data ──
   const heatDays = Array.from({ length: 28 }, (_, i) => ({
@@ -394,7 +452,7 @@ export default function AdminDashboard() {
             <button onClick={() => {
               localStorage.removeItem("mess_token");
               localStorage.removeItem("mess_user");
-              navigate("/login", { replace: true });
+              navigate("/", { replace: true });
               window.location.reload()
             }}
               className="hidden sm:flex items-center gap-1.5 text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-xl font-semibold transition-all cursor-pointer">
@@ -479,7 +537,7 @@ export default function AdminDashboard() {
                         { label: "Log Expense", icon: "📊", color: "bg-blue-50 hover:bg-blue-100 text-blue-700", fn: () => setShowExpense(true) },
                         { label: "Announce", icon: "📢", color: "bg-red-50 hover:bg-red-100 text-red-700", fn: () => setShowAnnouncement(true) },
                         { label: "Requests", icon: "⏳", color: "bg-amber-50 hover:bg-amber-100 text-amber-700", fn: () => setActiveNav("requests") },
-                        { label: "Scan QR", icon: "🔑", color: "bg-emerald-50 hover:bg-emerald-100 text-emerald-700", fn: () => setScannerOpen(true) },
+                        { label: "Scan QR", icon: "🔑", color: "bg-emerald-50 hover:bg-emerald-100 text-emerald-700", fn: () => navigate("/admin/scan") },
                         // NOTE: "Export Report" → navigate to reports page
                         { label: "Export Report", icon: "📄", color: "bg-violet-50 hover:bg-violet-100 text-violet-700", fn: () => alert("Navigating to reports export page...") },
                       ].map(a => (
@@ -579,7 +637,7 @@ export default function AdminDashboard() {
                   <p className="text-xs text-gray-400">{pendingList.length} students awaiting approval</p>
                 </div>
                 {pendingList.length > 0 && (
-                  <button onClick={() => { pendingList.forEach(s => acceptStudent(s.id)); toast("All requests approved!"); }}
+                  <button onClick={approveAll}
                     className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl font-bold shadow shadow-emerald-200 transition-all">
                     ✓ Approve All
                   </button>
@@ -896,7 +954,6 @@ export default function AdminDashboard() {
       {showMenu && <MenuModal onClose={() => setShowMenu(false)} />}
       {showExpense && <ExpenseModal onClose={() => setShowExpense(false)} />}
       {showAnnouncement && <AnnouncementModal onClose={() => setShowAnnouncement(false)} />}
-      {scannerOpen && <QRScannerModal onClose={() => setScannerOpen(false)} />}
 
       {/* ── Toast ── */}
       {toastMsg && (

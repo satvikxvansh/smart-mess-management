@@ -16,7 +16,7 @@ const { Student, Admin } = require("../database");
 
 const protect = async (req, res, next) => {
   try {
-    // ── 1. Extract token from header ─────────────────────────────────────────
+    //  1. Extract token from header 
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -28,7 +28,7 @@ const protect = async (req, res, next) => {
 
     const token = authHeader.split(" ")[1];
 
-    // ── 2. Verify token ───────────────────────────────────────────────────────
+    // 2. Verify token 
     let decoded;
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -39,7 +39,7 @@ const protect = async (req, res, next) => {
       return res.status(401).json({ success: false, message: "Invalid token." });
     }
 
-    // ── 3. Fetch fresh user from DB (confirms account still exists/active) ────
+    // 3. Fetch fresh user from DB (confirms account still exists/active) 
     if (decoded.role === "student") {
       const student = await Student.findById(decoded.id).select("-password");
       if (!student) {

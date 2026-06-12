@@ -3,10 +3,12 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+
 // ── Page imports ──────────────────────────────────────────────────────────────
 import SmartMessLogin    from "./pages/SmartMessLogin";      // login + register page
 import StudentDashboard  from "./pages/StudentDashboard";    // student portal
 import AdminDashboard    from "./pages/AdminDashboard";      // admin portal
+import AdminScanPage     from "./pages/AdminScanPage";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // RootRedirect
@@ -90,6 +92,7 @@ function AppRoutes() {
       ──────────────────────────────────────────────────────────────────── */}
       <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/scan" element={<AdminScanPage />} />
 
         {/*
          * TODO — Admin sub-pages (uncomment & create components as needed):

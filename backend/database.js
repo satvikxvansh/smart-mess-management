@@ -25,7 +25,7 @@ const connectDB = async () => {
 
 const studentSchema = new mongoose.Schema(
   {
-    // ── Personal info ────────────────────────────────────────────────────────
+    // Personal info
     name: {
       type    : String,
       required: [true, "Name is required"],
@@ -52,7 +52,7 @@ const studentSchema = new mongoose.Schema(
       match  : [/^[6-9]\d{9}$/, "Please provide a valid 10-digit Indian phone number"],
     },
 
-    // ── Academic info ────────────────────────────────────────────────────────
+    // Academic info 
     department: {
       type    : String,
       required: [true, "Department is required"],
@@ -70,7 +70,7 @@ const studentSchema = new mongoose.Schema(
       default: "",
     },
 
-    // ── Mess info ────────────────────────────────────────────────────────────
+    // Mess info 
     messType: {
       type   : String,
       enum   : ["Veg", "Non-Veg"],
@@ -82,7 +82,7 @@ const studentSchema = new mongoose.Schema(
       trim   : true,
     },
 
-    // ── Auth ─────────────────────────────────────────────────────────────────
+    // Auth 
     password: {
       type    : String,
       required: [true, "Password is required"],
@@ -101,7 +101,7 @@ const studentSchema = new mongoose.Schema(
       default: "pending",
     },
 
-    // ── Fee tracking ─────────────────────────────────────────────────────────
+    // Fee tracking 
     feeStatus: {
       type   : String,
       enum   : ["Paid", "Unpaid", "Partial"],
@@ -116,7 +116,7 @@ const studentSchema = new mongoose.Schema(
     totalMealsConsumed: { type: Number, default: 0 },
     currentStreak     : { type: Number, default: 0 },
 
-    // ── Metadata ─────────────────────────────────────────────────────────────
+    // Metadata
     approvedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref : "Admin",

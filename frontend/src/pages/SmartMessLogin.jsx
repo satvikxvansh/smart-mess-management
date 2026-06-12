@@ -75,6 +75,42 @@ export default function SmartMessLogin() {
     }
   };
 
+  const handleStudentRegister = async () => {
+    setError("");
+    if (form.password !== form.confirmPassword) {
+      return setError("Passwords do not match.");
+    }
+
+    setSubmitting(true);
+    try {
+      const payload = {
+        name: form.name,
+        rollNo: form.rollNo,
+        department: form.department,
+        year: form.year,
+        email: form.email,
+        phone: form.phone,
+        password: form.password,
+      };
+
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/student/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Registration failed.");
+
+      alert(data.message || "Registration successful! Please wait for admin approval.");
+      setStudentMode("login");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const handleAdminLogin = async () => {
     setError("");
     setSubmitting(true);
@@ -103,9 +139,9 @@ export default function SmartMessLogin() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (tab === "admin")                    return handleAdminLogin();
+    if (tab === "admin") return handleAdminLogin();
     if (tab === "student" && studentMode === "login") return handleStudentLogin();
-    // registration path stays as-is (you can wire that separately)
+    if (tab === "student" && studentMode === "register") return handleStudentRegister();
   };
 
   return (
@@ -300,7 +336,7 @@ export default function SmartMessLogin() {
 
                   <button type="submit" disabled={submitting}
                     className="text-white font-bold w-full p-2 rounded-xl cursor-pointer mt-2 bg-blue-600 ... disabled:opacity-60 disabled:cursor-not-allowed">
-                    {submitting ? "Signing in…" : "Sign In"}
+                    {submitting ? "Please wait…" : (studentMode === "login" ? "Sign In" : "Register")}
                   </button>
 
                   {studentMode === "login" && (

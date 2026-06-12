@@ -1,29 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import MessRequestModal from "../components/MessRequestModal";
-import MealQRCard from "../components/Mealqrcard";
+import { QRCodeSVG } from "qrcode.react";
+import MealQRCard from "../components/MealQRCard";
 // ─── Mock user Data ────────────────────────────────────────────────────────
 
-const bookedSet = new Set([
-  `${new Date().toDateString()}_breakfast`,
-  `${new Date().toDateString()}_lunch`,
-]);
-
-const user = {
-  name: "Deepesh Sharma",
-  rollNo: "BTECH/10743/23",
-  department: "Electronics & Communication Engineering",
-  year: "3rd Year",
-  hostel: "Hostel 13 - Room 222",
-  email: "btech10743.23@bitmesra.ac.in",
-  phone: "+91 98765 43210",
-  messType: "Non-Veg",
-  messBlock: "",
-  feeStatus: "Paid",
-  avatar: "AK",
-  validTill: "May 2025",
-};
+const BACKEND_URL = import.meta.env.VITE_API_URL;
 
 const ATTENDANCE = {
   thisMonth: { present: 22, total: 28, meals: { B: 20, L: 22, D: 19 } },
@@ -183,7 +166,7 @@ const PaymentModal = ({ onClose }) => {
     </div>
   );
 };
- 
+
 <MessRequestModal onClose={() => setOpen(false)} />
 
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
@@ -198,6 +181,9 @@ export default function userDashboard() {
   const [showPayment, setShowPayment] = useState(false);
   const [showMessRequest, setShowMessRequest] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [qrToken, setQrToken] = useState(null);
+  const [qrLoading, setQrLoading] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(900); // 15 min in seconds
 
   const pct = Math.round((ATTENDANCE.thisMonth.present / ATTENDANCE.thisMonth.total) * 100);
   const circumference = 2 * Math.PI * 36;
@@ -212,6 +198,47 @@ export default function userDashboard() {
     { id: "complaints", label: "Complaints", icon: "📢" }, // → redirect to complaints page
     { id: "settings", label: "Settings", icon: "⚙️" },    // → redirect to profile/settings page
   ];
+
+  const fetchQrToken = async () => {
+    setQrLoading(true);
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/attendance/generate-qr-token`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("mess_token")}`,
+        },
+      });
+      const data = await res.json();
+      if (data.success) {
+        setQrToken(data.qrToken);
+        setTimeLeft(data.expiresIn);  // reset countdown
+      }
+    } catch (err) {
+      console.error("QR fetch error:", err);
+    } finally {
+      setQrLoading(false);
+    }
+  };
+
+  // Fetch on mount, auto-refresh every 14 minutes
+  useEffect(() => {
+    fetchQrToken();
+    const refreshInterval = setInterval(fetchQrToken, 14 * 60 * 1000);
+    return () => clearInterval(refreshInterval);
+  }, []);
+
+  // Countdown timer
+  useEffect(() => {
+    if (timeLeft <= 0) return;
+    const tick = setInterval(() => setTimeLeft(t => t - 1), 1000);
+    return () => clearInterval(tick);
+  }, [timeLeft]);
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, "0");
+    const s = (seconds % 60).toString().padStart(2, "0");
+    return `${m}:${s}`;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex" style={{ fontFamily: "'DM Sans', 'Segoe UI', sans-serif" }}>
@@ -438,10 +465,25 @@ export default function userDashboard() {
             <div className="space-y-4">
 
               {/* Mess Card / QR */}
-              <MealQRCard
-                student={{ name: user.name, roll: user.rollNo, dept: user.branch }}
-                bookedSet={bookedSet}
-              />
+              {qrLoading ? (
+                <div className="w-20 h-20 bg-gray-100 rounded-lg mx-auto mb-3 flex items-center justify-center">
+                  <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : qrToken ? (
+                <div className="flex flex-col items-center mb-3">
+                  <div className="bg-white p-2 rounded-lg">
+                    <MealQRCard student={user} qrToken={qrToken}/>
+                  </div>
+                  {/* Countdown — turns red when under 2 minutes */}
+                  <p className={`text-xs mt-1 font-mono font-bold ${timeLeft < 120 ? "text-red-400" : "text-Blue/50"}`}>
+                    Refreshes in {formatTime(timeLeft)}
+                  </p>
+                </div>
+              ) : (
+                <button onClick={fetchQrToken} className="text-xs text-blue-300 underline mb-3">
+                  Load QR Code
+                </button>
+              )}
 
               {/* Attendance ring */}
               <SectionCard title="Monthly Attendance" icon="📅">
@@ -532,31 +574,6 @@ export default function userDashboard() {
                   All Notices →
                 </button>
               </SectionCard>
-
-              {/* <SectionCard title="QR Code Generation" icon="🪪">
-                <div className="bg-gradient-to-br from-[#0f172a] to-[#1e3a5f] rounded-xl p-4 text-white text-center">
-                  <p className="text-white/50 text-xs mb-1">BIT Mesra · Smart Mess</p>
-                  <div className="w-20 h-20 bg-white rounded-lg mx-auto mb-3 flex items-center justify-center overflow-hidden">
-                    <svg viewBox="0 0 40 40" className="w-16 h-16">
-                      {[0, 1, 2, 3, 4, 5, 6].map(r => [0, 1, 2, 3, 4, 5, 6].map(c => {
-                        const corner = (r < 2 && c < 2) || (r < 2 && c > 4) || (r > 4 && c < 2);
-                        const val = (r * 7 + c * 3 + 5) % 2 === 0;
-                        return val ? <rect key={`${r}-${c}`} x={c * 5 + 2.5} y={r * 5 + 2.5} width="4" height="4" fill={corner ? "#0f172a" : "#374151"} /> : null;
-                      }))}
-                    </svg>
-                  </div>
-                  <p className="font-bold text-sm">{user.name.split(" ")[0]} {user.name.split(" ")[1]}</p>
-                  <p className="text-white/50 text-xs">{user.rollNo}</p>
-                  <div className="mt-2 flex justify-center gap-1.5">
-                    <span className="text-xs bg-green-500/20 text-green-300 rounded-full px-2 py-0.5">Active</span>
-                    <span className="text-xs bg-white/10 rounded-full px-2 py-0.5">{user.messType}</span>
-                  </div>
-                </div>
-                <button onClick={() => alert("Generating downloadable mess card...")}
-                  className="mt-3 w-full py-2 text-xs text-gray-600 font-semibold hover:bg-gray-100 rounded-xl transition-all border border-gray-200">
-                  ⬇ Download Card
-                </button>
-              </SectionCard> */}
             </div>
           </div>
         </main>
